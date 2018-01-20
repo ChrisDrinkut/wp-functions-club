@@ -1,11 +1,8 @@
 <?php 
-function new_excerpt_more ($more) {
-global $post;
-return '...<a href="'. get_permalink($post->ID) . '">Read on ☞</a>';
-}
-add_filter('excerpt_more', 'new_excerpt_more');
 
-
+/*
+* Add menus
+*/
 function register_my_menus() {
   register_nav_menus(
     array(
@@ -18,8 +15,7 @@ function register_my_menus() {
 add_action( 'init', 'register_my_menus' );
 
 /**
- * Register our sidebars and widgetized areas.
- *
+ * Register sidebars and widgetized areas
  */
 function arphabet_widgets_init() {
 
@@ -35,3 +31,56 @@ function arphabet_widgets_init() {
 }
 add_action( 'widgets_init', 'arphabet_widgets_init' );
 
+
+/**
+* Created excerpt Read More
+**/
+function dude_excerpt_more ( $more ) {
+return "  ";
+}
+add_filter ( 'excerpt_more', 'dude_excerpt_more' );
+
+/*
+* Determine length of excerpt 
+*/
+function new_excerpt_length ( $length ) {
+return 24;
+}
+add_filter ( 'excerpt_length', 'new_excerpt_length' );
+
+/*
+* Make link
+*/
+function new_excerpt_more ($more) {
+global $post;
+return '...<a href="'. get_permalink($post->ID) . '">Read on ☞</a>';
+}
+add_filter('excerpt_more', 'new_excerpt_more');
+
+/*
+* Cleanup
+*/
+
+function cubiq_setup () {
+    remove_action('wp_head', 'wp_generator');                // #1
+    remove_action('wp_head', 'wlwmanifest_link');            // #2
+    remove_action('wp_head', 'rsd_link');                    // #3
+    remove_action('wp_head', 'wp_shortlink_wp_head');        // #4
+    remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);    // #5
+    add_filter('the_generator', '__return_false');            // #6
+    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );  // #8
+    remove_action( 'wp_print_styles', 'print_emoji_styles' );
+}
+add_action('after_setup_theme', 'cubiq_setup');
+
+/**
+* Dequeue jQuery Migrate script in WordPress.
+*/
+function isa_remove_jquery_migrate( &$scripts) {
+    if(!is_admin()) {
+        $scripts->remove( 'jquery');
+    }
+}
+add_filter( 'wp_default_scripts', 'isa_remove_jquery_migrate' );
+
+add_theme_support( 'post-thumbnails' );
